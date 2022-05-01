@@ -105,8 +105,8 @@ The top 15 most popular start and return stations for casual riders shows riders
 
 For interactive dashboards, please click [Tableau](https://public.tableau.com/app/profile/hao.li1811/viz/google_capstone_16473943254990/Story1?publish=yes).
 
-## ACT
-
+## ACT  
+  
 #### Conclusion:
 
 The casual riders likes to use the bikes over the weekends, and along the coastlines and sightseeing sites, comparing members ride times are more consistent during the weekdays. But both casual and membership riders like to use bikes around 5 pm, that means some casual riders also use bikes to commute from work.
