@@ -1,0 +1,309 @@
+I".�<p>Hello, this is Hao.</p>
+
+<p>As I was looking for more projects to practice, I came across with this virtual experience programe on <a href="https://www.theforage.com/" target="_blank">theforage.com</a>. The project is hosted by Accenture North America, and it’s called Navigating Numbers (full details can be found <a href="https://www.theforage.com/virtual-internships/prototype/hzmoNKtzvAzXsEqx8/Data-Analytics-Virtual-Experience?ref=9W3J5sbu3KKhpJDGr" target="_blank">here</a>). The goal for this project is to be “equipped with data fundamentals and an understanding of what a career in data analytics could look like”.</p>
+
+<p>The project is devided into 4 modules: project understanding, data cleaning and modeling, data visualization and storytelling, present to the client. Immediately, the flow from understand the business tasks, clean and process the data, to create visualization to gain business insights, all sounded very similar to the Google Data Analytics courses, but with one big different, in order to complete the course and receive the certificate, a video presentation must be recorded and submitted.</p>
+
+<p>Let’s get started.</p>
+
+<h2 id="company-background">Company Background</h2>
+
+<p>Social Buzz is a social media and content creation company founded in 2010, based in San Francisco. Over the past 5 years, it has reached over 500 million active users monthly. Every day over 100,000 pieces of content, ranging from text, images, videos and GIFs are posted.</p>
+
+<h2 id="business-task">Business Task</h2>
+
+<p>All the data users posted on Social Buzz is highly unstructured and requires extrememly sophisticated and expensive technology to manage and maintain. More than 80% of the employees are technical staff working on maintaining this highly complex technology.
+To start our engagement with Social Buzz, we are running a 3-month pilot program to prove to them that we are the best firm to work with to oversee their scaling process effectively.</p>
+
+<h4 id="deliverables">Deliverables</h4>
+
+<ul>
+  <li>An audit of their big data practice</li>
+  <li>Recommendations for a successful IPO</li>
+  <li>An analysis of their content categories that highlights the top 5 categories with largest aggregate popularity</li>
+</ul>
+
+<h4 id="my-duty">My Duty</h4>
+
+<p>As the data Analyst, I am primarily responsible for completing the hands-on analysis of data and find the top 5 popular categories of content, then translating the requirements of the project into insights.</p>
+
+<h2 id="prepare-the-data">Prepare the Data</h2>
+
+<p>The team has extracted a set of 7 sample data sets using SQL, my job is to make sense of the data and create my own data set to fulfill the requirements of this task.</p>
+
+<p>I will use RStudio as the tool of choice for this module.</p>
+
+<p>load in the libraries</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">Hmisc</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">janitor</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>load in the 7 data sets provided for this project</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rm</span><span class="p">(</span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ls</span><span class="p">())</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Content%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">location</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Location%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">profile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Profile%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Reactions%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">reaction_types</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/ReactionTypes%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">session</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Session%20(1).csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">user</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/User%20(1).csv"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>I will clean and explore each data set then decide which data set I will choose to merge into the final data set to find the 5 most popular categories.</p>
+
+<h4 id="1-content-data-set">1. content data set</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># use describe function to see if there are any missing values</span><span class="w">
+</span><span class="n">describe</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># remove unnecessary columns and clean column names</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="s2">"URL"</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">...1</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w">
+
+</span><span class="n">glimpse</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="w">
+
+
+</span><span class="c1"># some category names have quotes on them and some don't, remove marks and change to lower case to keep consistency</span><span class="w">
+
+</span><span class="n">content</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gsub</span><span class="p">(</span><span class="s1">'[\"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">category</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tolower</span><span class="p">(</span><span class="n">category</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="s2">"public_speaking"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"public speaking"</span><span class="p">),</span><span class="w">
+         </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="s2">"healthy_eating"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"healthy eating"</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># rename some of the column names to prepare for joining datasets</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">rename</span><span class="p">(</span><span class="n">content_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># initial exploration of the 'content' dataset</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">count</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">View</span><span class="p">()</span><span class="w">
+
+</span><span class="c1"># top 5 categories by content counts, but are they the 5 most popular?</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_lump</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">arrange</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">total</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># distribution of categories</span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_reorder</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">),)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">category</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">category</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_col</span><span class="p">(</span><span class="n">show.legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">coord_flip</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"rank on category by the number of posts"</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'number of posts'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p><img src="/img/posts/Accenture-Social/category by posts.png" alt="category by post" /></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># distribution of content_type </span><span class="w">
+</span><span class="n">content</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">content_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_reorder</span><span class="p">(</span><span class="n">content_type</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">content_type</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">content_type</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_col</span><span class="p">(</span><span class="n">show.legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">coord_flip</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'rank on content_type by the number of posts'</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'number of posts'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p><img src="/img/posts/Accenture-Social/content type by post.png" alt="category by post" /></p>
+
+<h4 id="2location-data-set">2.location data set</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span><span class="p">(</span><span class="n">location</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># remove unnecessary columns and clean column names</span><span class="w">
+</span><span class="n">location</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">location</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">...1</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w">
+
+</span><span class="c1">#extract state and zip code from address then drop address column</span><span class="w">
+</span><span class="n">location</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">location</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">zip_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_sub</span><span class="p">(</span><span class="n">address</span><span class="p">,</span><span class="w"> </span><span class="m">-5</span><span class="p">),</span><span class="w">
+         </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_sub</span><span class="p">(</span><span class="n">address</span><span class="p">,</span><span class="w"> </span><span class="m">-8</span><span class="p">,</span><span class="w"> </span><span class="m">-7</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">address</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># initial exploration of the 2 new columns</span><span class="w">
+</span><span class="n">location</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">count</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">View</span><span class="p">()</span><span class="w">
+</span><span class="n">location</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">count</span><span class="p">(</span><span class="n">zip_code</span><span class="p">,</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="n">glimpse</span><span class="p">(</span><span class="n">location</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="3-profile">3. profile</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># remove unnecessary columns</span><span class="w">
+</span><span class="n">profile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">profile</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="s1">'...1'</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="s1">'Age'</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># clean Interests column, separate each category into its own rows and remove marks</span><span class="w">
+</span><span class="n">profile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">profile</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">separate_rows</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">','</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_replace</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"\\'"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">   
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_replace</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"\\["</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">   
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_replace</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"\\]"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">   
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_replace</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"\\'"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">   
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_replace</span><span class="p">(</span><span class="n">Interests</span><span class="p">,</span><span class="w"> </span><span class="s2">" "</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w"> 
+
+</span><span class="c1"># recode some of the misspelled names</span><span class="w">
+</span><span class="n">profile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">profile</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"public_speaking"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"public speaking"</span><span class="p">),</span><span class="w">
+         </span><span class="n">interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"public_speaking"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"publicspeaking"</span><span class="p">),</span><span class="w">
+         </span><span class="n">interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"healthy_eating"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"healthy eating"</span><span class="p">),</span><span class="w">
+         </span><span class="n">interests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_recode</span><span class="p">(</span><span class="n">interests</span><span class="p">,</span><span class="w"> </span><span class="s2">"healthy_eating"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"healthyeating"</span><span class="p">))</span><span class="w"> 
+
+
+</span><span class="n">profile</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">count</span><span class="p">(</span><span class="n">interests</span><span class="p">,</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="4-reaction">4. reaction</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span><span class="p">(</span><span class="n">reaction</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># looking into datetime column, extracting the month, day, weekday and hour info for initial exploration in R</span><span class="w">
+</span><span class="c1"># also remove unnecessary columns and clean col names</span><span class="w">
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">Month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">month</span><span class="p">(</span><span class="n">Datetime</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">),</span><span class="w">
+         </span><span class="n">Day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">day</span><span class="p">(</span><span class="n">Datetime</span><span class="p">),</span><span class="w">
+         </span><span class="n">Weekday</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wday</span><span class="p">(</span><span class="n">Datetime</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">),</span><span class="w">
+         </span><span class="n">Hour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hour</span><span class="p">(</span><span class="n">Datetime</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="n">user_id</span><span class="p">))</span><span class="w"> 
+
+</span><span class="c1"># rename type to reaction_type to prepare the final data set</span><span class="w">
+
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">rename</span><span class="p">(</span><span class="n">reaction_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># reaction type distribution</span><span class="w">
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">reaction_type</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">reaction_type</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">reaction_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fct_reorder</span><span class="p">(</span><span class="n">reaction_type</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">reaction_type</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reaction_type</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_col</span><span class="p">(</span><span class="n">show.legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">F</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'reaction type distribution'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'number of reactions'</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p><img src="/img/posts/Accenture-Social/reaction type distribution.png" alt="category by post" /></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># initial exploration on the time variables</span><span class="w">
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">month</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_line</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">expand_limits</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'reactoin count by month'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">weekday</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">weekday</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_line</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">expand_limits</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'reaction count by weekday'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+
+</span><span class="n">reaction</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">())</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">hour</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_line</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">expand_limits</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'reaction count by hour'</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="5-reaction_types">5. reaction_types</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove unnecessary columns, clean col names, and rename type to reaciton_type</span><span class="w">
+</span><span class="n">reaction_types</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">reaction_types</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="s2">"...1"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">rename</span><span class="p">(</span><span class="n">reaction_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># what kind of reaction_types have high scores</span><span class="w">
+</span><span class="n">reaction_types</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">arrange</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">score</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># sentiment distribution</span><span class="w">
+</span><span class="n">reaction_types</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">count</span><span class="p">(</span><span class="n">sentiment</span><span class="p">,</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="6-session">6. session</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove unnecessary columns, clean col names</span><span class="w">
+
+</span><span class="n">session</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">...1</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="7-user-data-set">7. user data set</h4>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove unnecessary columns, clean col names</span><span class="w">
+</span><span class="n">user</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">...1</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">clean_names</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<h5 id="after-cleaning-and-some-initial-analysis-this-is-what-i-learned">After cleaning and some initial analysis, this is what I learned:</h5>
+<h5 id="my-duty-is-to-find-out-the-top-5-most-popular-categories-it-should-be-based-on-the-content-reactions-not-the-count-of-how-many-posts-of-content-in-each-category-i-will-use-the-score-system-from-the-reaction-type-data-set-to-calculate-the-ranks-to-complete-this-task-i-will-only-use-location-content-reaction-and-reaction_type-these-4-data-sets-for-my-final-data-set">My duty is to find out the top 5 most popular categories, it should be based on the content reactions, not the count of how many posts of content in each category. I will use the score system from the reaction type data set to calculate the ranks. To complete this task, I will only use location, content, reaction and reaction_type these 4 data sets for my final data set.</h5>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># first let's join the tables</span><span class="w">
+
+</span><span class="n">buzz_full</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">location</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">right_join</span><span class="p">(</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'user_id'</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">left_join</span><span class="p">(</span><span class="n">reaction</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'content_id'</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">left_join</span><span class="p">(</span><span class="n">reaction_types</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'reaction_type'</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># export the dataset for future analysis</span><span class="w">
+ </span><span class="n">write.csv</span><span class="p">(</span><span class="n">buzz_full</span><span class="p">,</span><span class="w"> </span><span class="s2">"C:\\Users\\haoli\\Desktop\\buzz_full.csv"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># then we can use the aggregated score to rank the categories</span><span class="w">
+</span><span class="n">buzz_full</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">total_score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">score</span><span class="p">,</span><span class="w"> </span><span class="n">na.rm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">arrange</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">total_score</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># the top 5 categories are: animals, science, healthy_eating, technology, food</span><span class="w">
+</span><span class="n">social_buzz_top5</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">buzz_full</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">filter</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"animals"</span><span class="p">,</span><span class="w"> </span><span class="s2">"science"</span><span class="p">,</span><span class="w"> </span><span class="s2">"healthy_eating"</span><span class="p">,</span><span class="w"> </span><span class="s2">"technology"</span><span class="p">,</span><span class="w"> </span><span class="s2">"food"</span><span class="p">))</span><span class="w">
+ </span><span class="n">write.csv</span><span class="p">(</span><span class="n">social_buzz_top5</span><span class="p">,</span><span class="w"> </span><span class="s2">"C:\\Users\\haoli\\Desktop\\social_buzz_top5.csv"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>After using Tableau for further analysis, I found some interesting insights:</p>
+
+<p><img src="/img/posts/Accenture-Social/top 5 by score.png" alt="top 5 categories" /></p>
+
+<p><img src="/img/posts/Accenture-Social/wdays.png" alt="wdays" /></p>
+
+<ul>
+  <li>Animals and science are the 2 most popular categories, suggesting that users like “real-life” content and have curious minds.</li>
+  <li>It’s also interesting to see both healthy eating and food in the top 5, shows me users are pursuing a healthy life style.</li>
+  <li>It’s not surprising to see technology in the top 5, since we lives have been changed so much by it, especially during the pandemic time. It presents a huge opportunity for the company to differentiate their platform and run specific content on it.</li>
+  <li>Additoinally, the most active weekdays are Fridays, Sundays and Mondays, their marketing team can focus on those days for promotions and product launches.</li>
+</ul>
+
+<p><img src="/img/posts/Accenture-Social/top 5 dashboard.png" alt="top 5 dashboard" />
+For the interactive Tableau dashborad, please click <a href="https://public.tableau.com/app/profile/hao.li1811/viz/Social_Buzz_Top5_Dashboard/top5dashboard" target="_blank">here</a></p>
+
+:ET

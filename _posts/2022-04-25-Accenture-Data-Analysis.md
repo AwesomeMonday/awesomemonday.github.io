@@ -14,21 +14,44 @@ The project is devided into 4 modules: project understanding, data cleaning and 
 
 Let's get started.
 
+## Company Background
+
+Social Buzz is a social media and content creation company founded in 2010, based in San Francisco. Over the past 5 years, it has reached over 500 million active users monthly. Every day over 100,000 pieces of content, ranging from text, images, videos and GIFs are posted. 
+
+## Business Task
+
+All the data users posted on Social Buzz is highly unstructured and requires extrememly sophisticated and expensive technology to manage and maintain. More than 80% of the employees are technical staff working on maintaining this highly complex technology.
+To start our engagement with Social Buzz, we are running a 3-month pilot program to prove to them that we are the best firm to work with to oversee their scaling process effectively.
+
+#### Deliverables
+
+- An audit of their big data practice
+- Recommendations for a successful IPO
+- An analysis of their content categories that highlights the top 5 categories with largest aggregate popularity
+
+#### My Duty
+
+As the data Analyst, I am primarily responsible for completing the hands-on analysis of data and find the top 5 popular categories of content, then translating the requirements of the project into insights.
 
 
+## Prepare the Data
+
+The team has extracted a set of 7 sample data sets using SQL, my job is to make sense of the data and create my own data set to fulfill the requirements of this task. 
+
+I will use RStudio as the tool of choice for this module.
 
 load in the libraries
 
-```{r}
+```r
 library(tidyverse)
 library(Hmisc)
 library(lubridate)
 library(janitor)
 ```
 
-load in the data sets
+load in the 7 data sets provided for this project
 
-```{r}
+```r
 rm(list = ls())
 content <- read_csv("https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/Content%20(1).csv")
 
@@ -44,15 +67,15 @@ session <- read_csv("https://cdn.theforage.com/vinternships/companyassets/T6kdcd
 
 user <- read_csv("https://cdn.theforage.com/vinternships/companyassets/T6kdcdKSTfg2aotxT/User%20(1).csv")
 ```
+I will clean and explore each data set then decide which data set I will choose to merge into the final data set to find the 5 most popular categories.
 
-1. content data set
-log: removed unnecessary columns, and clean col names; cleaned category names;
-this data set will join with other sets on content_id and user_id
+#### 1. content data set  
 
-```{r}
+```r
 # use describe function to see if there are any missing values
 describe(content)
 
+# remove unnecessary columns and clean column names
 content <- content %>% 
   select(-"URL", -...1) %>% 
   clean_names()
@@ -60,7 +83,7 @@ content <- content %>%
 glimpse(content)
 
 
-# some category has quotes on them and some don't, remove marks and change to lower case to keep consistency
+# some category names have quotes on them and some don't, remove marks and change to lower case to keep consistency
 
 content <- content %>% 
   mutate(category = gsub('[\"]', '', category)) %>% 
@@ -77,7 +100,7 @@ content %>%
   count(category, sort = TRUE) %>% 
   View()
 
-# top 5 categories by content category
+# top 5 categories by content counts, but are they the 5 most popular?
 content %>% 
   mutate(category = fct_lump(category, 5)) %>% 
   group_by(category) %>% 
@@ -93,8 +116,10 @@ content %>%
   geom_col(show.legend = FALSE) +
   coord_flip() +
   labs(title = "rank on category by the number of posts", y = 'number of posts', x = '')
+```
+![category by post](/img/posts/Accenture-Social/category by posts.png)
 
-
+```r
 # distribution of content_type 
 content %>% 
   group_by(content_type) %>% 
@@ -105,14 +130,14 @@ content %>%
   coord_flip()+
   labs(title = 'rank on content_type by the number of posts', y = 'number of posts', x = '')
 ```
+![category by post](/img/posts/Accenture-Social/content type by post.png)
 
-2.location data set
-log: removed unnecessary columns and cleaned col names; extracted zip code and state name from address then dropped address column
-this set will join with user data set on user_id to view the state distribution on map
+#### 2.location data set
 
-```{r}
+```r
 describe(location)
 
+# remove unnecessary columns and clean column names
 location <- location %>% 
   select(-...1) %>% 
   clean_names()
@@ -132,16 +157,16 @@ location %>%
 glimpse(location)
 ```
 
-3. profile
-log: separated interests into individual rows, removed marks and corrected spelling error, and dropped age column
-this set will NOT be used to join with other datasets for the final csv
+#### 3. profile
 
-```{r}
+```r
 describe(profile)
 
+# remove unnecessary columns
 profile <- profile %>% 
   select(-'...1', -'Age')
 
+# clean Interests column, separate each category into its own rows and remove marks
 profile <- profile %>% 
   separate_rows(Interests, sep = ',') %>% 
   mutate(Interests = str_replace(Interests, "\\'", "")) %>%   
@@ -158,19 +183,18 @@ profile <- profile %>%
          interests = fct_recode(interests, "healthy_eating" = "healthy eating"),
          interests = fct_recode(interests, "healthy_eating" = "healthyeating")) 
 
+
 profile %>% 
   count(interests, sort = TRUE)
 ```
 
-4. reaction
-log: removed unnecessary columns and cleaned col names; extracted time info for future analysis; 
-dropped the user_id column since it refers the user that interacted with the content, not the user who created it; 
-this set will join with reaction_types on type to get the scores of each content thru group by
+#### 4. reaction
 
-```{r}
+```r
 describe(reaction) 
 
 # looking into datetime column, extracting the month, day, weekday and hour info for initial exploration in R
+# also remove unnecessary columns and clean col names
 reaction <- reaction %>% 
   mutate(Month = month(Datetime, label = TRUE),
          Day = day(Datetime),
@@ -178,7 +202,9 @@ reaction <- reaction %>%
          Hour = hour(Datetime)) %>% 
   clean_names() %>%
   select(-(x1), -(user_id)) 
-  
+
+# rename type to reaction_type to prepare the final data set
+
 reaction <- reaction %>% 
   rename(reaction_type = type) 
 
@@ -191,7 +217,11 @@ reaction %>%
   ggplot(aes(total, reaction_type, fill = reaction_type))+
   geom_col(show.legend = F) +
   labs(title = 'reaction type distribution', x = 'number of reactions', y = '')
- 
+```
+![category by post](/img/posts/Accenture-Social/reaction type distribution.png)
+
+
+```r
 # initial exploration on the time variables
 reaction %>% 
   group_by(month) %>% 
@@ -218,15 +248,12 @@ reaction %>%
   labs(title = 'reaction count by hour', x = '', y = '')
 ```
 
-5. reaction_types
-log: removed unnecessary columns and cleaned col names; 
-this set will join reaction data set and use the score to rank the top 5 categories that is in the task
+#### 5. reaction_types
 
-```{r}
+```r
+# remove unnecessary columns, clean col names, and rename type to reaciton_type
 reaction_types <- reaction_types %>% 
-  select(-"...1")
-
-reaction_types <- reaction_types %>% 
+  select(-"...1") %>%
   clean_names() %>%
   rename(reaction_type = type)
 
@@ -239,30 +266,29 @@ reaction_types %>%
   count(sentiment, sort = TRUE)
 ```
 
-6. session
-log: removed unnecessary columns and cleaned names; 
-this data set can provide us some interesting insights on device usage, but it's not ralevant to the analysis this time
+#### 6. session
 
-```{r}
+```r
+# remove unnecessary columns, clean col names
+
 session <- session %>% 
   select(-...1) %>% 
   clean_names()
 ```
 
-7. user data set
-log: removed unnecessary columns and cleaned column names
-we don't need the user info for our business task
+#### 7. user data set
 
-```{r}
+```r
+# remove unnecessary columns, clean col names
 user <- user %>% 
   select(-...1) %>% 
   clean_names()
 ```
 
-since the business task is to find out the top 5 most popular categories, it should be based on the content reactions, but the count of how many posts
-of content in each category. I will use the score to calculate the ranks. 
+##### After cleaning and some initial analysis, this is what I learned:  
+##### My duty is to find out the top 5 most popular categories, it should be based on the content reactions, not the count of how many posts of content in each category. I will use the score system from the reaction type data set to calculate the ranks. To complete this task, I will only use location, content, reaction and reaction_type these 4 data sets for my final data set.
 
-```{r}
+```r
 # first let's join the tables
 
 buzz_full <- location %>% 
@@ -271,7 +297,7 @@ buzz_full <- location %>%
   left_join(reaction_types, by = 'reaction_type')
 
 # export the dataset for future analysis
-# write.csv(buzz_full, "C:\\Users\\haoli\\Desktop\\buzz_full.csv")
+ write.csv(buzz_full, "C:\\Users\\haoli\\Desktop\\buzz_full.csv")
 
 # then we can use the aggregated score to rank the categories
 buzz_full %>% 
@@ -282,6 +308,20 @@ buzz_full %>%
 # the top 5 categories are: animals, science, healthy_eating, technology, food
 social_buzz_top5 <- buzz_full %>% 
   filter(category %in% c("animals", "science", "healthy_eating", "technology", "food"))
-# write.csv(social_buzz_top5, "C:\\Users\\haoli\\Desktop\\social_buzz_top5.csv")
+ write.csv(social_buzz_top5, "C:\\Users\\haoli\\Desktop\\social_buzz_top5.csv")
 ```
+After using Tableau for further analysis, I found some interesting insights:
+
+![top 5 categories](/img/posts/Accenture-Social/top 5 by score.png)
+
+![wdays](/img/posts/Accenture-Social/wdays.png)
+
+- Animals and science are the 2 most popular categories, suggesting that users like "real-life" content and have curious minds.
+- It's also interesting to see both healthy eating and food in the top 5, shows me users are pursuing a healthy life style.
+- It's not surprising to see technology in the top 5, since we lives have been changed so much by it, especially during the pandemic time. It presents a huge opportunity for the company to differentiate their platform and run specific content on it.
+- Additoinally, the most active weekdays are Fridays, Sundays and Mondays, their marketing team can focus on those days for promotions and product launches.
+
+![top 5 dashboard](/img/posts/Accenture-Social/top 5 dashboard.png)
+For the interactive Tableau dashborad, please click [here](https://public.tableau.com/app/profile/hao.li1811/viz/Social_Buzz_Top5_Dashboard/top5dashboard){:target="_blank"}.
+
 
