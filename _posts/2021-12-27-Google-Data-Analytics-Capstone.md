@@ -23,7 +23,7 @@ The director of marketing Lily Moreno, believes the company’s future success d
 
 ## PREPARE THE DATA
 
-I have downloaded the past 12 months data (January 2021 to December 2021) from the given link: [Cyclistic Trip Data](http://divvy-tripdata.s3.amazonaws.com/index.html). According to the case study material, the data has been made available by Motivate International Inc., the license information can be found [here](https://ride.divvybikes.com/data-license-agreement).
+I have downloaded the past 12 months data (January 2021 to December 2021) from the given link: [Cyclistic Trip Data](http://divvy-tripdata.s3.amazonaws.com/index.html){:target="_blank"}. According to the case study material, the data has been made available by Motivate International Inc., the license information can be found [here](https://ride.divvybikes.com/data-license-agreement){:target="_blank"}.
 
 The data provides information on the starting and ending time and station names, for each ride trip, also indicates the customer types (members or casuals), I can use them to answer the business questions.
 
