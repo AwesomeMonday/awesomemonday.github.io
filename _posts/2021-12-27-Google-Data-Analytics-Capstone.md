@@ -6,7 +6,9 @@ date: 2021-12-27 23:45:13 +0500
 background: '/img/posts/Google-Cyclistic/bike-share.jpg'
 ---
 
-Hello, this is Hao. I have recently completed my Google data analytics certificate courses, and I chose to move forward with the Cyclistic Bike-Share for my case study. I followed the six steps that was taught in the course (ASK, PREPARE, PROCESS, ANALYZE, SHARE, ACT). Below I will share my thought process on how I processed and what I understood from the given tasks.
+Hello, this is Hao. 
+
+I have recently completed my Google data analytics certificate courses, and I chose to move forward with the Cyclistic Bike-Share for my case study. I followed the six steps that was taught in the course (ASK, PREPARE, PROCESS, ANALYZE, SHARE, ACT). Below I will share my thought process on how I processed and what I understood from the given tasks.
 
 
 ## COMPANY BACKGROUND
