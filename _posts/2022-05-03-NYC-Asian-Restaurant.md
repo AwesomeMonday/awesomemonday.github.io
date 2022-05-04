@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "NYC Asian Restaurants on Yelp.com"
+title: "NYC Asian Restaurants on Yelp.com (part 1. Data collecting)"
 subtitle: "Web Scraping with R"
 date: 2022-05-03 23:45:13 +0500
 background: '/img/posts/NYC-Restaurants/restaurant-back.jpg'
