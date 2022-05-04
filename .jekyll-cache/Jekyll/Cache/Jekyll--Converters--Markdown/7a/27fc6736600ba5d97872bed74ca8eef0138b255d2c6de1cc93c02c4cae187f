@@ -1,0 +1,156 @@
+I"ó<p>Hello, this is Hao.</p>
+
+<p>The month of May we celebrate Asian America and Pacific Islander heritage. So I decided to take a look at the Asian restaurants in the NYC area on yelp.com.</p>
+
+<p>I will use R with the rvest package to scrape some data from the website.</p>
+
+<p>load in libraries</p>
+<pre><code class="language-{r}">library(tidyverse)
+library(Hmisc)
+library(lubridate)
+library(rvest)
+
+</code></pre>
+
+<p>letâ€™s scrape the info from the first page</p>
+
+<pre><code class="language-{r}"># clean all the variables from environment
+rm(list = ls())
+
+# read in the link of the website page, this is the 1 of 24 pages
+link &lt;- "https://www.yelp.com/search?find_desc=Asian+Restaurant&amp;find_loc=New+York%2C+NY&amp;start=0"
+page &lt;- read_html(link)
+
+# get the restaurant names from the first page
+name &lt;- page %&gt;% 
+  html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+  html_text2()
+
+# use href in html_attr function to get the extension of each restaurant page, then paste together to get the entire url
+restaurant_link &lt;- page %&gt;% 
+  html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+  html_attr("href") %&gt;% 
+  paste0("http://www.yelp.com", .)
+
+# since the ratings are not in numeric numbers, but in graphs, I inspected the scc code and did the following
+rating &lt;- page %&gt;% 
+  html_elements(xpath = "//div[contains(@aria-label, 'rating')]") %&gt;% 
+  html_attr("aria-label") %&gt;% 
+  str_remove_all(" star rating") %&gt;% 
+  as.numeric()
+
+# obtain the rating count of each restaurant
+rating_count &lt;- page %&gt;% 
+  html_nodes(".reviewCount__09f24__tnBk4") %&gt;% 
+  html_text2() %&gt;% 
+  as.numeric()
+
+neighborhood &lt;- page %&gt;% 
+  html_nodes(".css-dzq7l1 .css-chan6m") %&gt;% 
+  html_text()
+
+# creating a function to get the cuisine types from each of the restaurant page 
+
+get_cuisine &lt;- function(restaurant_link){
+  restaurant_page &lt;- read_html(restaurant_link)
+  cuisine &lt;- restaurant_page %&gt;% 
+    html_nodes(".css-1fdy0l5 .css-1m051bw") %&gt;% 
+    html_text2() %&gt;% 
+    paste(collapse = ", ")
+  return(cuisine)
+}
+
+# use the sapply function to obtain the cuisine info from each restaurant page
+cuisine &lt;- sapply(restaurant_link, FUN = get_cuisine, USE.NAMES = FALSE)
+
+# I also want to get the price range of each restaurant from inside the page
+get_price &lt;- function(restaurant_link){
+  restaurant_page &lt;- read_html(restaurant_link)
+  price &lt;- restaurant_page %&gt;% 
+    html_nodes(".css-1ir4e44") %&gt;% 
+    html_text2() %&gt;% 
+    {if(length(.) == 0) NA else .}
+  return(price)
+}
+
+price &lt;- sapply(restaurant_link, FUN = get_price, USE.NAMES = FALSE)
+
+# combine everything into a new tibble
+restaurant &lt;- tibble(name, cuisine, price, rating, rating_count, neighborhood)
+View(restaurant)
+</code></pre>
+
+<p>scraping multiple pages</p>
+
+<pre><code class="language-{r}">
+name_all &lt;- c()
+rating_all &lt;- c()
+rating_count_all &lt;- c()
+neighborhood_all &lt;- c()
+cuisine_all &lt;- c()
+price_all &lt;- c()
+
+
+for (page_result in seq(from = 0, to = (24*10) - 10, by = 10)){
+  link &lt;- paste0("https://www.yelp.com/search?find_desc=Asian+Restaurant&amp;find_loc=New+York%2C+NY&amp;start=",  page_result)
+  
+  page &lt;- read_html(link)
+  
+  name &lt;- page %&gt;% 
+   html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+   html_text2()
+
+  restaurant_link &lt;- page %&gt;% 
+   html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+   html_attr("href") %&gt;% 
+   paste0("http://www.yelp.com", .)
+  
+  rating &lt;- page %&gt;% 
+  html_elements(xpath = "//div[contains(@aria-label, 'rating')]") %&gt;% 
+  html_attr("aria-label") %&gt;% 
+  str_remove_all(" star rating") %&gt;% 
+  as.numeric()
+
+# obtain the rating count of each restaurant
+rating_count &lt;- page %&gt;% 
+  html_nodes(".reviewCount__09f24__tnBk4") %&gt;% 
+  html_text2() 
+
+neighborhood &lt;- page %&gt;% 
+  html_nodes(".css-dzq7l1 .css-chan6m") %&gt;% 
+  html_text()
+
+cuisine &lt;- sapply(restaurant_link, FUN = get_cuisine, USE.NAMES = FALSE)
+
+price &lt;- sapply(restaurant_link, FUN = get_price, USE.NAMES = FALSE)
+
+name_all &lt;- append(name_all, name)
+rating_all &lt;- append(rating_all, rating)
+rating_count_all &lt;- append(rating_count_all, rating_all)
+neighborhood_all &lt;- append(neighborhood_all, neighborhood)
+cuisine_all &lt;- append(cuisine_all, cuisine)
+price_all &lt;- append(price_all, price)
+
+print(paste("page", page_result))
+}
+
+restaurant &lt;- tibble("name" = name_all,
+                     "rating" = rating_all,
+                     "rating_count" = rating_count_all,
+                     "neighborhood" = neighborhood_all,
+                     "cuisine" = cuisine_all,
+                     "price" = price_all)
+
+View(restaurant)
+
+restaurant &lt;- restaurant %&gt;% 
+  mutate(price = case_when(is.na(price) ~ "unknown",
+                           price == "$" ~"Under $10",
+                           price == "$$" ~"$11 - $30",
+                           price == "$$$" ~"$31 - $60",
+                           price == "$$$$" ~"$61 and Above"))
+View(restaurant)
+write_csv(restaurant, "C:/Users/haoli/Desktop/NY_asian_restaurants.csv")
+</code></pre>
+
+:ET

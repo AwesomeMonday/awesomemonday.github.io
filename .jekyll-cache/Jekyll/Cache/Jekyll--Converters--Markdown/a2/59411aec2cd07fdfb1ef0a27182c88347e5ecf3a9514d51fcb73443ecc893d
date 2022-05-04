@@ -1,0 +1,159 @@
+I"�7<p>Hello, this is Hao.</p>
+
+<p>The month of May we celebrate Asian America and Pacific Islander heritage. So I decided to take a look at the Asian restaurants in the NYC area on yelp.com.</p>
+
+<p>I will use R with the rvest package to scrape some data from the website.</p>
+
+<p>This is how the first page looks, I will need the restaurant names, cuisine types, ratings, total rating count, price range, and neighborhood area. I will go through all 24 pages on the site, but I won’t touch the review details yet, that would be the task for another day.</p>
+
+<p><img src="/img/posts/NYC-Restaurants/yelp.png" alt="yelp" /></p>
+
+<p>load in libraries</p>
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">rvest</span><span class="p">)</span><span class="w">
+
+</span></code></pre></div></div>
+
+<p>let’s start from the first page.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># clean all the variables from environment</span><span class="w">
+</span><span class="n">rm</span><span class="p">(</span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ls</span><span class="p">())</span><span class="w">
+
+</span><span class="c1"># read in the link of the website page</span><span class="w">
+</span><span class="n">link</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"https://www.yelp.com/search?find_desc=Asian+Restaurant&amp;find_loc=New+York%2C+NY&amp;start=0"</span><span class="w">
+</span><span class="n">page</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_html</span><span class="p">(</span><span class="n">link</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># get the restaurant names from the first page</span><span class="w">
+</span><span class="n">name</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".css-1egxyvc .css-1m051bw"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_text2</span><span class="p">()</span><span class="w">
+
+</span><span class="c1"># use href in html_attr function to get the extension of each restaurant page, then paste together to get the entire url that I can use</span><span class="w">
+</span><span class="n">restaurant_link</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".css-1egxyvc .css-1m051bw"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_attr</span><span class="p">(</span><span class="s2">"href"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">paste0</span><span class="p">(</span><span class="s2">"http://www.yelp.com"</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># since the ratings are not in numeric numbers, but in graphs, I inspected the scc code and did the following</span><span class="w">
+</span><span class="n">rating</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_elements</span><span class="p">(</span><span class="n">xpath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"//div[contains(@aria-label, 'rating')]"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_attr</span><span class="p">(</span><span class="s2">"aria-label"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">str_remove_all</span><span class="p">(</span><span class="s2">" star rating"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="nf">as.numeric</span><span class="p">()</span><span class="w">
+
+</span><span class="c1"># obtain the rating count of each restaurant</span><span class="w">
+</span><span class="n">rating_count</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".reviewCount__09f24__tnBk4"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_text2</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="nf">as.numeric</span><span class="p">()</span><span class="w">
+
+</span><span class="c1"># obtian the location area</span><span class="w">
+</span><span class="n">neighborhood</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".css-dzq7l1 .css-chan6m"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">html_text</span><span class="p">()</span><span class="w">
+
+</span><span class="c1"># I decided to go into each restaurant page to get the cuisine information, and make this a function since I will need to do it for every restaurant</span><span class="w">
+
+</span><span class="n">get_cuisine</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">){</span><span class="w">
+  </span><span class="n">restaurant_page</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_html</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">)</span><span class="w">
+  </span><span class="n">cuisine</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">restaurant_page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".css-1fdy0l5 .css-1m051bw"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="n">html_text2</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="n">paste</span><span class="p">(</span><span class="n">collapse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">", "</span><span class="p">)</span><span class="w">
+  </span><span class="nf">return</span><span class="p">(</span><span class="n">cuisine</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="c1"># use the sapply function to obtain the cuisine info from each restaurant page</span><span class="w">
+</span><span class="n">cuisine</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sapply</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">,</span><span class="w"> </span><span class="n">FUN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_cuisine</span><span class="p">,</span><span class="w"> </span><span class="n">USE.NAMES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># I also want to get the price range of each restaurant from inside the page</span><span class="w">
+</span><span class="n">get_price</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">){</span><span class="w">
+  </span><span class="n">restaurant_page</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read_html</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">)</span><span class="w">
+  </span><span class="n">price</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">restaurant_page</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="n">html_nodes</span><span class="p">(</span><span class="s2">".css-1ir4e44"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="n">html_text2</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+    </span><span class="p">{</span><span class="k">if</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">.</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="kc">NA</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">.</span><span class="p">}</span><span class="w">
+  </span><span class="nf">return</span><span class="p">(</span><span class="n">price</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="n">price</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sapply</span><span class="p">(</span><span class="n">restaurant_link</span><span class="p">,</span><span class="w"> </span><span class="n">FUN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_price</span><span class="p">,</span><span class="w"> </span><span class="n">USE.NAMES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># combine everything into a new tibble </span><span class="w">
+</span><span class="n">restaurant</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tibble</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">cuisine</span><span class="p">,</span><span class="w"> </span><span class="n">price</span><span class="p">,</span><span class="w"> </span><span class="n">rating</span><span class="p">,</span><span class="w"> </span><span class="n">rating_count</span><span class="p">,</span><span class="w"> </span><span class="n">neighborhood</span><span class="p">)</span><span class="w">
+</span><span class="n">View</span><span class="p">(</span><span class="n">restaurant</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>scraping multiple pages</p>
+
+<pre><code class="language-{r}">
+name_all &lt;- c()
+rating_all &lt;- c()
+rating_count_all &lt;- c()
+neighborhood_all &lt;- c()
+cuisine_all &lt;- c()
+price_all &lt;- c()
+
+
+for (page_result in seq(from = 0, to = (24*10) - 10, by = 10)){
+  link &lt;- paste0("https://www.yelp.com/search?find_desc=Asian+Restaurant&amp;find_loc=New+York%2C+NY&amp;start=",  page_result)
+  
+  page &lt;- read_html(link)
+  
+  name &lt;- page %&gt;% 
+   html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+   html_text2()
+
+  restaurant_link &lt;- page %&gt;% 
+   html_nodes(".css-1egxyvc .css-1m051bw") %&gt;% 
+   html_attr("href") %&gt;% 
+   paste0("http://www.yelp.com", .)
+  
+  rating &lt;- page %&gt;% 
+  html_elements(xpath = "//div[contains(@aria-label, 'rating')]") %&gt;% 
+  html_attr("aria-label") %&gt;% 
+  str_remove_all(" star rating") %&gt;% 
+  as.numeric()
+
+# obtain the rating count of each restaurant
+rating_count &lt;- page %&gt;% 
+  html_nodes(".reviewCount__09f24__tnBk4") %&gt;% 
+  html_text2() 
+
+neighborhood &lt;- page %&gt;% 
+  html_nodes(".css-dzq7l1 .css-chan6m") %&gt;% 
+  html_text()
+
+cuisine &lt;- sapply(restaurant_link, FUN = get_cuisine, USE.NAMES = FALSE)
+
+price &lt;- sapply(restaurant_link, FUN = get_price, USE.NAMES = FALSE)
+
+name_all &lt;- append(name_all, name)
+rating_all &lt;- append(rating_all, rating)
+rating_count_all &lt;- append(rating_count_all, rating_all)
+neighborhood_all &lt;- append(neighborhood_all, neighborhood)
+cuisine_all &lt;- append(cuisine_all, cuisine)
+price_all &lt;- append(price_all, price)
+
+print(paste("page", page_result))
+}
+
+restaurant &lt;- tibble("name" = name_all,
+                     "rating" = rating_all,
+                     "rating_count" = rating_count_all,
+                     "neighborhood" = neighborhood_all,
+                     "cuisine" = cuisine_all,
+                     "price" = price_all)
+
+View(restaurant)
+
+restaurant &lt;- restaurant %&gt;% 
+  mutate(price = case_when(is.na(price) ~ "unknown",
+                           price == "$" ~"Under $10",
+                           price == "$$" ~"$11 - $30",
+                           price == "$$$" ~"$31 - $60",
+                           price == "$$$$" ~"$61 and Above"))
+View(restaurant)
+write_csv(restaurant, "C:/Users/haoli/Desktop/NY_asian_restaurants.csv")
+</code></pre>
+
+:ET
