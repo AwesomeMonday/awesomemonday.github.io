@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "What are the 5 most popular categories of a social media company"
-subtitle: "A Accenture Data Analytics Project."
+subtitle: "An Accenture Data Analytics Project."
 date: 2022-04-25 23:45:13 +0500
 background: '/img/posts/Accenture-Social/social-background.png'
 ---
