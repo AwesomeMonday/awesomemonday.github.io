@@ -79,3 +79,5 @@ nyt_decades %>%
   ```
 
 ![nyt-bestsellers](/img/posts/NYT-bestsells/NYT-bestseller.png)
+
+Analysis: as we can see from the plot above, starting from the 1990 decade to 2010 decade, the number of titles on the best-sellers chart are more than doubled than the previous decades. 
