@@ -1,0 +1,4 @@
+I"~<p><code class="language-plaintext highlighter-rouge">{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+</code></p>
+:ET

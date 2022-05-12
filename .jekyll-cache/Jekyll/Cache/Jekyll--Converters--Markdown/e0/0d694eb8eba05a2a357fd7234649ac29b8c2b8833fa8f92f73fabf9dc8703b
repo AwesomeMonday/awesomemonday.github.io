@@ -1,0 +1,74 @@
+I"Û<p>```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+load in libraries
+```{r}
+install.packages("ggpubr")
+library(tidyverse)
+library(Hmisc)
+library(lubridate)
+library(scales)
+library(ggpubr)
+library(ggstream)
+library(showtext)
+library(ggthemes)
+library(viridis)
+theme_set(theme_pubr())
+</code></pre></div></div>
+
+<p>load in data</p>
+<pre><code class="language-{r}">rm(list = ls())
+nyt_titles &lt;- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-05-10/nyt_titles.tsv')
+nyt_full &lt;- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-05-10/nyt_full.tsv')
+
+</code></pre>
+<p>load in fonts</p>
+
+<pre><code class="language-{r}">font_add_google(name = "Macondo", family = "Macondo")
+font_add_google(name = "Montserrat", family = "Montserrat")
+showtext_auto()
+</code></pre>
+<p>I will only use the titles data set for my analysis</p>
+<pre><code class="language-{r}">
+nyt_titles %&gt;% 
+  View()
+
+nyt_titles %&gt;% 
+  count(year, sort = TRUE)
+
+# number of books made to the chart over the decades
+
+nyt_decades &lt;- nyt_titles %&gt;% 
+  filter(year != 2020) %&gt;% 
+  mutate(decades = (year %/% 10) * 10) %&gt;% 
+  group_by(decades) %&gt;% 
+  summarise(total_books = n())
+
+# plot
+nyt_decades %&gt;% 
+  ggplot(aes(decades, total_books, fill = total_books)) +
+  geom_col(show.legend = F) +
+  coord_polar(start = 0)+
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(1930, 2010, 10))+
+  labs(
+    title = "Number of NYT Best-selling Books by Decades",
+    caption = "TidyTuesday | wk19 NY Times Best-seller List \nVisualization by Hao Li"
+  ) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold", family = "Macondo", hjust = .5, vjust = -4),
+    plot.caption = element_text(family = "Montserrat", color = "black", size = 10, vjust = 29),
+    axis.title = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_blank(),
+    panel.grid.major  = element_blank(),
+    panel.background = element_rect(fill = "lightblue", color = "lightblue")
+  ) +
+  scale_fill_viridis(discrete = FALSE)
+  
+  
+  
+
+</code></pre>
+
+:ET
