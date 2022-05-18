@@ -1,0 +1,8 @@
+I"Ÿ<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">tidytuesdayR</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">ggthemes</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">gganimate</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">gifski</span><span class="p">)</span><span class="w">
+</span><span class="n">theme_set</span><span class="p">(</span><span class="n">theme_wsj</span><span class="p">())</span><span class="w">
+</span></code></pre></div></div>
+:ET
