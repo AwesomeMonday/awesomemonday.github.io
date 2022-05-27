@@ -1,0 +1,52 @@
+I"2<p>Hello, this is Hao.</p>
+
+<p>On May 17th 2022, the coronavirus has taken more than 1 million lives in the United States alone, you can read this article from NPR <a href="https://www.npr.org/sections/health-shots/2022/05/17/1093651037/us-one-million-deaths" target="_blank">here</a>. I wanted to see what we have learned about the virus and how it’s affecting different countries in the world, so I downloaded the data set from <a href="https://github.com/owid/covid-19-data/tree/master/public/data" target="_blank">ourworldindata’s github page</a>.</p>
+
+<p>The data has more than 188 thousand rows and more than 60 columns, I decided to break it into 3 smaller sets and drop some columns that I don’t need for the analysis today.</p>
+
+<p>I broke the data set down into covid_cases;
+<img src="/img/posts/covid/covid_cases.png" alt="covid_cases" /></p>
+
+<p>covid_vaccinations;
+<img src="/img/posts/covid/covid_vaccinations.png" alt="covid_cases" /></p>
+
+<p>and countries.
+<img src="/img/posts/covid/countries.png" alt="covid_cases" /></p>
+
+<p>Then I used LOAD DATA LOCAL INFILE to load the 3 data sets into my new database
+<img src="/img/posts/covid/loadindata.png" alt="covid_cases" /></p>
+
+<p>After verifying all the tables, I want to look at some key numbers from the global view. Infection rate is the confirmed cases in total population, infection fatality rate is the total death number in the total confirmed cases, and fully vaccinated rate is the people who received at least 2 vaccine shots over the entire population.
+<img src="/img/posts/covid/overview.png" alt="covid_cases" /></p>
+
+<p>Next I want to look at the confirmed cases by countries. And I was shocked by how much more cases and deaths the United States have over the second place India, nearly doubled!
+<img src="/img/posts/covid/cases_by_country.png" alt="covid_cases" /></p>
+
+<p>I am taking a look at the numbers between continents, Europe has the 3rd most population but it ranked both the 1st place in confirmed cases and death numbers.
+<img src="/img/posts/covid/continent_rank.png" alt="covid_cases" /></p>
+
+<p>Let’s drill down in the European countries
+<img src="/img/posts/covid/europe.png" alt="covid_cases" /></p>
+
+<p>Is the country with larger population also has higher infection rate? The answer is no, in the matter of fact, China has a surprising low rate.
+<img src="/img/posts/covid/pop_infection_rate.png" alt="covid_cases" /></p>
+
+<p>There is a income category, as we can see from the results below, high income group has the highest infection rate, but the infection fatality rate is the lowest in the groups, perhaps they have better access to treatments, I will need to find more data to look into.
+<img src="/img/posts/covid/income.png" alt="covid_cases" /></p>
+
+<p>I want to look at how the numbers change globally over time, I will visual this using Tableau later.
+<img src="/img/posts/covid/global_rate.png" alt="covid_cases" /></p>
+
+<p>I also want to see the vaccination rates in countries
+<img src="/img/posts/covid/vac_rate.png" alt="covid_cases" /></p>
+
+<p>What are the relationship between age and infection also death rate? I will get the data and look at it in Tableau.
+<img src="/img/posts/covid/age_rate.png" alt="covid_cases" /></p>
+
+<p>Now let’s add the data sources to Tableau to get a better understanding on the data.</p>
+
+<p>From the chart below, we can confirm thru the color depth and the circle size, the United States, India, Russia, Mexico and Brazil are the countries leading in confirmed cases and numbers of deaths.</p>
+
+<p><img src="/img/posts/covid/case deaths country.png" alt="covid_cases" /></p>
+
+:ET
