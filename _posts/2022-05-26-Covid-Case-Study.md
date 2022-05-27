@@ -70,4 +70,4 @@ By looking at the chart below, the younger the age, the lower the infection rate
 
 ![covid_cases](/img/posts/covid/age_infection_rate.png)
 
-I also put up an interactive dashboard on [Tableau Public](https://public.tableau.com/app/profile/hao.li1811/viz/covid_cases_study/covidcasestudy){:target="_blank"}, any feedback would be grately appreciated.
+I also put up an interactive dashboard on [Tableau Public](https://public.tableau.com/app/profile/hao.li1811/viz/covid_cases_study/covidcasestudy){:target="_blank"}, any feedback would be greatly appreciated.
